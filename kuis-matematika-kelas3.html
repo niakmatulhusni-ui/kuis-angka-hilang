@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petualangan Matematika - Kelas 3 SD</title>
+<style>
+  :root{
+    --biru:#4a90e2; --kuning:#f5c542; --hijau:#5ec85e; --merah:#ef5b5b;
+    --ungu:#8e6bd6; --oranye:#ff9a3c; --bg1:#fff7e6; --bg2:#e8f4ff;
+    --teks:#2b2d42; --abu:#6b7280;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS','Baloo 2',system-ui,sans-serif;}
+  html,body{height:100%;}
+  body{
+    min-height:100vh;
+    background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);
+    color:var(--teks);
+    display:flex;align-items:center;justify-content:center;
+    padding:16px;overflow-x:hidden;
+  }
+
+  /* ====== KARTU UTAMA ====== */
+  .kartu{
+    width:100%;max-width:760px;
+    background:#ffffff;border-radius:24px;
+    box-shadow:0 12px 40px rgba(74,144,226,.25);
+    padding:28px 26px;position:relative;overflow:hidden;
+    border:6px solid #fff;
+  }
+  .kartu::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(245,197,66,.18), transparent 40%),
+      radial-gradient(circle at 95% 100%, rgba(142,107,214,.18), transparent 40%);
+    pointer-events:none;
+  }
+
+  /* ====== HEADER ====== */
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+  .logo{font-size:42px;animation:gepar .8s infinite ease-in-out alternate;display:inline-block;}
+  @keyframes gepar{from{transform:rotate(-8deg) scale(1);}to{transform:rotate(8deg) scale(1.08);}}
+  .judul{font-size:24px;color:var(--biru);font-weight:800;line-height:1.1;}
+  .subjudul{font-size:13px;color:var(--abu);}
+
+  /* ====== PROGRES ====== */
+  .bar-bungkus{height:18px;background:#eef3fb;border-radius:20px;overflow:hidden;margin:10px 0 6px;border:2px solid #dce6f5;}
+  .bar-isi{height:100%;width:0;background:linear-gradient(90deg,var(--hijau),var(--kuning));border-radius:20px;transition:width .5s ease;}
+  .bar-teks{font-size:12px;color:var(--abu);text-align:right;}
+
+  /* ====== LAYAR ====== */
+  .layar{display:none;animation:muncul .4s ease;}
+  .layar.aktif{display:block;}
+  @keyframes muncul{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ====== IDENTITAS ====== */
+  .sapa{font-size:22px;color:var(--ungu);font-weight:800;margin-bottom:6px;}
+  .penjelasan{font-size:14px;color:var(--teks);line-height:1.6;margin-bottom:18px;}
+  .grup{margin-bottom:14px;}
+  .label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;color:var(--biru);}
+  .input{width:100%;padding:12px 14px;font-size:16px;border:3px solid #d6e4f7;border-radius:14px;outline:none;transition:.2s;background:#fbfdff;}
+  .input:focus{border-color:var(--biru);box-shadow:0 0 0 4px rgba(74,144,226,.18);}
+  .pilih-kelas{display:flex;gap:8px;flex-wrap:wrap;}
+  .pilih-kelas button{
+    flex:1;min-width:90px;padding:10px;border:3px solid #d6e4f7;background:#fff;
+    border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;color:var(--abu);
+  }
+  .pilih-kelas button.terpilih{background:var(--biru);color:#fff;border-color:var(--biru);transform:translateY(-2px);}
+  .input-error{color:var(--merah);font-size:13px;margin-top:6px;min-height:18px;}
+
+  /* ====== TOMBOL ====== */
+  .tombol{
+    display:inline-block;padding:14px 30px;font-size:17px;font-weight:800;
+    border:none;border-radius:18px;cursor:pointer;transition:.2s;color:#fff;
+    box-shadow:0 6px 0 rgba(0,0,0,.12);
+  }
+  .tombol:hover{transform:translateY(-2px);box-shadow:0 8px 14px rgba(0,0,0,.18);}
+  .tombol:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .tombol:disabled{background:#cfd8e3;cursor:not-allowed;box-shadow:none;transform:none;}
+  .tombol-utama{background:var(--hijau);}
+  .tombol-biru{background:var(--biru);}
+  .tombol-ungu{background:var(--ungu);}
+  .tengah{text-align:center;margin-top:18px;}
+
+  /* ====== KOTAK SOAL ====== */
+  .nomor-soal{display:inline-block;background:var(--kuning);color:#5b4400;font-weight:800;padding:6px 16px;border-radius:20px;font-size:14px;margin-bottom:12px;}
+  .jenis{display:inline-block;background:#fff3cd;color:#8a6500;font-size:12px;font-weight:700;padding:4px 12px;border-radius:14px;margin-left:8px;}
+  .teks-soal{font-size:22px;font-weight:800;text-align:center;margin:18px 0;color:var(--teks);}
+  .bilangan-kotak{display:inline-block;background:#fff3cd;border:3px dashed var(--oranye);border-radius:10px;padding:2px 14px;margin:0 4px;color:#8a6500;font-weight:800;}
+  .area-jawab{margin:24px 0;text-align:center;}
+
+  /* Pilihan ganda */
+  .pilihan{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .pilihan button{
+    padding:18px;font-size:22px;font-weight:800;border:3px solid #d6e4f7;background:#fff;
+    border-radius:16px;cursor:pointer;transition:.15s;color:var(--biru);
+  }
+  .pilihan button:hover{background:#f0f7ff;border-color:var(--biru);transform:scale(1.03);}
+  .pilihan button.benar{background:var(--hijau);color:#fff;border-color:var(--hijau);}
+  .pilihan button.salah{background:var(--merah);color:#fff;border-color:var(--merah);}
+  .pilihan button:disabled{cursor:not-allowed;opacity:.85;}
+
+  /* Input angka */
+  .input-jawab{width:160px;padding:14px;font-size:30px;text-align:center;border:4px solid var(--biru);border-radius:16px;outline:none;font-weight:800;color:var(--biru);}
+  .input-jawab:focus{box-shadow:0 0 0 5px rgba(74,144,226,.2);}
+
+  /* Drag and drop */
+  .zona-lempar{display:inline-block;min-width:160px;min-height:70px;padding:10px 24px;margin:0 6px;
+    border:4px dashed var(--ungu);border-radius:16px;background:#f7f3ff;
+    font-size:26px;font-weight:800;color:var(--ungu);vertical-align:middle;line-height:50px;}
+  .zona-lempar.terisi{background:#efe6ff;border-style:solid;}
+  .zona-lempar.drag-atas{background:#e6d6ff;border-color:var(--ungu);}
+  .ubin-bungkus{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
+  .ubin{padding:16px 22px;font-size:24px;font-weight:800;background:linear-gradient(145deg,#fff,#f0e6ff);
+    border:3px solid var(--ungu);border-radius:14px;cursor:grab;color:var(--ungu);
+    box-shadow:0 5px 0 rgba(142,107,214,.4);user-select:none;touch-action:none;transition:transform .1s;}
+  .ubin:active{cursor:grabbing;}
+  .ubin.terpakai{opacity:.25;pointer-events:none;}
+  .ubin.dipakai-temp{transform:scale(1.1);}
+
+  /* Klik grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:420px;margin:0 auto;}
+  .grid button{padding:22px 10px;font-size:26px;font-weight:800;border:4px solid #d6e4f7;background:#fff;
+    border-radius:18px;cursor:pointer;transition:.15s;color:var(--oranye);box-shadow:0 5px 0 #e5dccd;}
+  .grid button:hover{background:#fff5e6;transform:translateY(-2px);box-shadow:0 7px 0 #e5dccd;}
+  .grid button:active{transform:translateY(2px);box-shadow:0 1px 0 #e5dccd;}
+  .grid button.benar{background:var(--hijau);color:#fff;border-color:var(--hijau);box-shadow:0 5px 0 #3e9a3e;}
+  .grid button.salah{background:var(--merah);color:#fff;border-color:var(--merah);box-shadow:0 5px 0 #b54343;}
+
+  /* ====== PENGUATAN ====== */
+  .penguatan{margin-top:18px;padding:14px 18px;border-radius:16px;font-size:16px;font-weight:700;text-align:center;display:none;animation:muncul .3s ease;}
+  .penguatan.tampil{display:block;}
+  .penguatan.benar{background:#e6f9e6;color:#2e7d32;border:2px solid var(--hijau);}
+  .penguatan.salah{background:#fdeaea;color:#c62828;border:2px solid var(--merah);}
+  .penguatan.info{background:#e7f0ff;color:#1565c0;border:2px solid var(--biru);}
+  .penguatan .emoji{font-size:26px;display:block;margin-bottom:4px;}
+  .percobaan-info{font-size:13px;color:var(--abu);text-align:center;margin-top:8px;}
+
+  /* ====== HASIL ====== */
+  .bungkusan-bintang{font-size:54px;text-align:center;margin:14px 0;letter-spacing:6px;}
+  .skor-besar{font-size:48px;font-weight:800;color:var(--hijau);text-align:center;margin:8px 0;}
+  .skor-teks{font-size:16px;color:var(--abu);text-align:center;margin-bottom:14px;}
+  .tabel-hasil{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;}
+  .tabel-hasil th,.tabel-hasil td{padding:9px 8px;border-bottom:1px solid #eef2f7;text-align:left;}
+  .tabel-hasil th{background:#f0f7ff;color:var(--biru);}
+  .tabel-hasil td:nth-child(2),.tabel-hasil td:nth-child(3){text-align:center;}
+  .badge-benar{background:var(--hijau);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;}
+  .badge-ulang{background:var(--kuning);color:#5b4400;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;}
+  .badge-salah{background:var(--merah);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;}
+
+  /* Confetti */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+
+  /* Shake */
+  .getar{animation:getar .4s;}
+  @keyframes getar{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+
+  .sembunyi{display:none !important;}
+
+  .footer-mini{font-size:11px;color:var(--abu);text-align:center;margin-top:18px;}
+
+  @media (max-width:520px){
+    .teks-soal{font-size:18px;}
+    .pilihan button,.grid button{font-size:18px;padding:14px 6px;}
+    .input-jawab{font-size:24px;width:130px;}
+    .ubin{font-size:20px;padding:12px 16px;}
+    .zona-lempar{font-size:22px;min-width:120px;}
+  }
+</style>
+</head>
+<body>
+<div class="kartu">
+
+  <!-- ====== LAYAR 1: IDENTITAS ====== -->
+  <section class="layar aktif" id="layar-identitas">
+    <div class="header">
+      <span class="logo">🦊</span>
+      <div>
+        <div class="judul">Petualangan Matematika</div>
+        <div class="subjudul">Penjumlahan & Pengurangan Bilangan Cacah sampai 1000</div>
+      </div>
+    </div>
+    <div class="sapa">Hai teman! Yuk petualangan menjawab soal matematika! 🎉</div>
+    <p class="penjelasan">
+      Sebelum mulai, tuliskan <b>nama</b> dan pilih <b>kelas</b>-mu terlebih dahulu.
+      Ada <b>12 soal</b> seru dengan cara menjawab yang berbeda-beda:
+      pilih gambar, ketik angka, seret ubin, dan klik kotak.
+      Setiap soal bisa diulang <b>satu kali</b> kalau salah, ya!
+    </p>
+
+    <div class="grup">
+      <label class="label" for="nama">👶 Nama Lengkap</label>
+      <input type="text" id="nama" class="input" placeholder="Tulis namamu di sini..." autocomplete="off" maxlength="40">
+    </div>
+
+    <div class="grup">
+      <label class="label">🏫 Pilih Kelas</label>
+      <div class="pilih-kelas" id="pilih-kelas">
+        <button type="button" data-kelas="3A">3A</button>
+        <button type="button" data-kelas="3B">3B</button>
+        <button type="button" data-kelas="3C">3C</button>
+        <button type="button" data-kelas="3D">3D</button>
+      </div>
+    </div>
+    <div class="input-error" id="err-identitas"></div>
+
+    <div class="tengah">
+      <button class="tombol tombol-utama" id="btn-mulai">🚀 Mulai Petualangan!</button>
+    </div>
+  </section>
+
+  <!-- ====== LAYAR 2: KUIS ====== -->
+  <section class="layar" id="layar-kuis">
+    <div class="header">
+      <span class="logo">🐰</span>
+      <div style="flex:1;min-width:160px;">
+        <div class="judul" id="info-siswa" style="font-size:18px;"></div>
+        <div class="bar-teks" id="info-progres"></div>
+      </div>
+    </div>
+
+    <div class="bar-bungkus"><div class="bar-isi" id="bar-isi"></div></div>
+
+    <div class="nomor-soal" id="nomor-soal">Soal 1 dari 12</div>
+    <span class="jenis" id="jenis-soal"></span>
+
+    <div class="teks-soal" id="teks-soal"></div>
+    <div class="area-jawab" id="area-jawab"></div>
+
+    <div class="percobaan-info" id="percobaan-info"></div>
+    <div class="penguatan" id="penguatan"></div>
+
+    <div class="tengah">
+      <button class="tombol tombol-biru" id="btn-lanjut" disabled>➡️ Lanjut</button>
+    </div>
+  </section>
+
+  <!-- ====== LAYAR 3: HASIL ====== -->
+  <section class="layar" id="layar-hasil">
+    <div class="header">
+      <span class="logo">🏆</span>
+      <div class="judul">Petualangan Selesai!</div>
+    </div>
+    <div class="sapa" id="hasil-sapa" style="text-align:center;"></div>
+    <div class="bungkusan-bintang" id="bintang"></div>
+    <div class="skor-besar" id="skor-besar"></div>
+    <div class="skor-teks" id="skor-teks"></div>
+
+    <table class="tabel-hasil">
+      <thead>
+        <tr><th>No</th><th>Soal</th><th>Jawaban</th><th>Status</th></tr>
+      </thead>
+      <tbody id="tubuh-hasil"></tbody>
+    </table>
+
+    <div class="tengah">
+      <button class="tombol tombol-ungu" id="btn-ulang">🔄 Main Lagi</button>
+    </div>
+    <div class="footer-mini">Dibuat untuk siswa Kelas 3 SD • Operasi bentuk tak langsung (bilangan hilang) sampai 1000</div>
+  </section>
+
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+/* ==========================================================
+   GENERATOR SOAL — 12 soal bentuk tak langsung (bilangan hilang),
+   bilangan cacah sampai 1000. Angka & posisi hilang diacak
+   setiap kali siswa mulai, supaya tidak monoton.
+   Pola tetap: 6 penjumlahan + 6 pengurangan, 6 awal + 6 akhir,
+   dan 4 variasi cara menjawab (pilgan/input/drag/grid) bergiliran.
+   ========================================================== */
+const acakInt = (min, max) => Math.floor(Math.random()*(max-min+1))+min;
+
+// a + b = c, semua bilangan <= 1000, kedua operand >= 100 (3 digit)
+function genPenjumlahan(kosong){
+  const a = acakInt(120, 750);
+  const b = acakInt(120, 1000 - a);
+  const c = a + b;
+  return kosong==='awal'
+    ? { teks:`___ + ${b} = ${c}`, jawaban:a, op:'+', kosong }
+    : { teks:`${a} + ___ = ${c}`, jawaban:b, op:'+', kosong };
+}
+// a - b = c, a <= 1000, b >= 80 supaya hasil tidak terlalu kecil
+function genPengurangan(kosong){
+  const a = acakInt(300, 1000);
+  const b = acakInt(80, a - 80);
+  const c = a - b;
+  return kosong==='awal'
+    ? { teks:`___ - ${b} = ${c}`, jawaban:a, op:'-', kosong }
+    : { teks:`${a} - ___ = ${c}`, jawaban:b, op:'-', kosong };
+}
+
+// Distraktor yang masuk akal untuk siswa kelas 3:
+// selisih ±1, ±10, ±100, ±9, ±11 (menangkap kesalahan angka/tukar digit/lupa simpan)
+function buatDistraktor(jawaban, n=3){
+  const set = new Set([jawaban]);
+  const hasil = [];
+  const kandidat = [jawaban+10, jawaban-10, jawaban+1, jawaban-1,
+    jawaban+100, jawaban-100, jawaban+9, jawaban-9, jawaban+11, jawaban-11,
+    jawaban+90, jawaban-90, jawaban+2, jawaban-2].sort(()=>Math.random()-0.5);
+  for(const k of kandidat){
+    if(k>=0 && k<=1000 && !set.has(k)){ set.add(k); hasil.push(k); if(hasil.length===n) break; }
+  }
+  let step=13;
+  while(hasil.length<n){
+    const atas=jawaban+step, bawah=jawaban-step;
+    if(atas<=1000 && !set.has(atas)){ set.add(atas); hasil.push(atas); }
+    else if(bawah>=0 && !set.has(bawah)){ set.add(bawah); hasil.push(bawah); }
+    step+=17;
+  }
+  return hasil;
+}
+
+// Pola tetap untuk 12 soal (variasi terjaga), angkanya acak
+const TEMPLATE = [
+  { jenis:'pilgan', op:'+', kosong:'awal'  },
+  { jenis:'input',  op:'+', kosong:'akhir' },
+  { jenis:'drag',   op:'-', kosong:'awal'  },
+  { jenis:'grid',   op:'+', kosong:'akhir' },
+  { jenis:'pilgan', op:'-', kosong:'awal'  },
+  { jenis:'input',  op:'-', kosong:'akhir' },
+  { jenis:'drag',   op:'+', kosong:'awal'  },
+  { jenis:'grid',   op:'-', kosong:'akhir' },
+  { jenis:'pilgan', op:'-', kosong:'akhir' },
+  { jenis:'input',  op:'+', kosong:'awal'  },
+  { jenis:'drag',   op:'-', kosong:'akhir' },
+  { jenis:'grid',   op:'+', kosong:'awal'  },
+];
+const LABEL_JENIS = { pilgan:'Pilihan Ganda', input:'Ketik Angka', drag:'Seret Ubin', grid:'Klik Kotak' };
+
+function buatSoalAcak(){
+  return TEMPLATE.map(t=>{
+    const base = t.op==='+' ? genPenjumlahan(t.kosong) : genPengurangan(t.kosong);
+    const s = { jenis:t.jenis, label:LABEL_JENIS[t.jenis], teks:base.teks,
+      kosong:t.kosong, op:base.op, jawaban:base.jawaban };
+    if(t.jenis==='pilgan') s.opsi = acak([base.jawaban, ...buatDistraktor(base.jawaban,3)]);
+    else if(t.jenis==='drag') s.ubin = acak([base.jawaban, ...buatDistraktor(base.jawaban,3)]);
+    else if(t.jenis==='grid') s.kotak = acak([base.jawaban, ...buatDistraktor(base.jawaban,3)]);
+    return s;
+  });
+}
+
+let SOAL = []; // diisi oleh buatSoalAcak() saat siswa menekan "Mulai"
+
+/* ====== Bank penguatan ====== */
+const PUAT_BENAR = [
+  ['🎉','Hebat sekali! Jawabanmu tepat!'],
+  ['🌟','Mantap! Kamu pintar matematika!'],
+  ['👏','Pintar! Lanjut ke soal berikutnya!'],
+  ['🥳','Tepat sasaran! Kamu juara!'],
+  ['💪','Keren! Otakmu cerdas sekali!'],
+];
+const PUAT_BENAR_ULANG = [
+  ['😅','Selamat! Akhirnya benar juga!'],
+  ['🙂','Bagus, kamu tidak menyerah!'],
+  ['✨','Tetap semangat, ya!'],
+];
+const PUAT_SALAH = [
+  ['🤔','Yuk dicoba sekali lagi! Kamu pasti bisa!'],
+  ['💪','Belum tepat, coba pikirkan lagi ya!'],
+  ['🌱','Hampir! Ayo ulangi sekali lagi!'],
+];
+
+/* ====== State ====== */
+let state = {
+  nama:'', kelas:'', idx:0,
+  percobaan:0, jawabanSiswa:null, selesai:false,
+  hasil:[] // {no, teks, jawabanBenar, jawabanSiswa, status:'benar'|'ulang'|'salah'}
+};
+
+/* ====== Util ====== */
+const $ = s => document.querySelector(s);
+const acak = arr => arr.slice().sort(()=>Math.random()-0.5);
+function pilih(acakArr){ return acakArr[Math.floor(Math.random()*acakArr.length)]; }
+
+/* ====== Suara ====== */
+let audioCtx=null;
+function bunyi(tipe){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if(tipe==='benar'){
+      o.type='triangle'; o.frequency.setValueAtTime(523,audioCtx.currentTime);
+      o.frequency.setValueAtTime(659,audioCtx.currentTime+0.12);
+      o.frequency.setValueAtTime(784,audioCtx.currentTime+0.24);
+      g.gain.setValueAtTime(0.18,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.4);
+      o.start(); o.stop(audioCtx.currentTime+0.42);
+    } else if(tipe==='salah'){
+      o.type='sawtooth'; o.frequency.setValueAtTime(220,audioCtx.currentTime);
+      o.frequency.setValueAtTime(180,audioCtx.currentTime+0.15);
+      g.gain.setValueAtTime(0.15,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);
+      o.start(); o.stop(audioCtx.currentTime+0.32);
+    } else if(tipe==='selesai'){
+      [523,659,784,1047].forEach((f,i)=>{
+        const oo=audioCtx.createOscillator(), gg=audioCtx.createGain();
+        oo.connect(gg); gg.connect(audioCtx.destination);
+        oo.type='triangle'; oo.frequency.value=f;
+        gg.gain.setValueAtTime(0.001,audioCtx.currentTime+i*0.12);
+        gg.gain.exponentialRampToValueAtTime(0.18,audioCtx.currentTime+i*0.12+0.02);
+        gg.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+i*0.12+0.25);
+        oo.start(audioCtx.currentTime+i*0.12); oo.stop(audioCtx.currentTime+i*0.12+0.27);
+      });
+    }
+  }catch(e){}
+}
+
+/* ====== Render soal sesuai jenis ====== */
+function tampilkanSoal(){
+  const s = SOAL[state.idx];
+  state.percobaan = 0;
+  state.jawabanSiswa = null;
+  state.selesai = false;
+
+  $('#nomor-soal').textContent = `Soal ${state.idx+1} dari 12`;
+  $('#jenis-soal').textContent = s.label;
+  $('#info-siswa').textContent = `👤 ${state.nama} • Kelas ${state.kelas}`;
+  $('#info-progres').textContent = `Soal ${state.idx+1}/12`;
+  $('#bar-isi').style.width = ((state.idx)/12*100) + '%';
+  $('#btn-lanjut').disabled = true;
+  $('#penguatan').className='penguatan';
+  $('#percobaan-info').textContent = '(percobaan 1 dari 2)';
+
+  // Teks soal dengan kotak kosong
+  const parts = s.teks.split('___');
+  const html = parts[0] + '<span class="bilangan-kotak">?</span>' + parts[1];
+  $('#teks-soal').innerHTML = html;
+
+  const area = $('#area-jawab');
+  area.innerHTML = '';
+  area.className = 'area-jawab';
+  $('#percobaan-info').style.display = 'block';
+
+  if(s.jenis==='pilgan') renderPilgan(s, area);
+  else if(s.jenis==='input') renderInput(s, area);
+  else if(s.jenis==='drag') renderDrag(s, area);
+  else if(s.jenis==='grid') renderGrid(s, area);
+}
+
+/* --- Pilihan ganda --- */
+function renderPilgan(s, area){
+  const wrap = document.createElement('div');
+  wrap.className='pilihan';
+  acak(s.opsi).forEach(opt=>{
+    const b=document.createElement('button');
+    b.textContent=opt; b.type='button';
+    b.onclick=()=>jawabPilgan(b, opt, s, wrap);
+    wrap.appendChild(b);
+  });
+  area.appendChild(wrap);
+}
+function jawabPilgan(b, opt, s, wrap){
+  if(state.selesai) return;
+  [...wrap.children].forEach(x=>x.disabled=true);
+  const benar = opt===s.jawaban;
+  if(benar) b.classList.add('benar');
+  else { b.classList.add('salah'); // tandai jawaban benar
+    [...wrap.children].forEach(x=>{ if(+x.textContent===s.jawaban) x.classList.add('benar'); });
+  }
+  prosesJawab(opt, s, b);
+}
+
+/* --- Input angka --- */
+function renderInput(s, area){
+  const inp=document.createElement('input');
+  inp.type='number'; inp.className='input-jawab'; inp.id='inp-jawab';
+  inp.placeholder='?'; inp.inputMode='numeric'; inp.min=0; inp.max=1000;
+  inp.onkeydown=e=>{ if(e.key==='Enter'){ cekInput(inp,s); } };
+  const br=document.createElement('div'); br.style.height='10px';
+  const tombolCek=document.createElement('button');
+  tombolCek.className='tombol tombol-biru'; tombolCek.textContent='✓ Periksa';
+  tombolCek.onclick=()=>cekInput(inp,s);
+  area.appendChild(inp);
+  area.appendChild(br);
+  area.appendChild(tombolCek);
+  setTimeout(()=>inp.focus(),100);
+}
+function cekInput(inp,s){
+  if(state.selesai) return;
+  const v=inp.value.trim();
+  if(v==='' || isNaN(+v)){ inp.classList.add('getar'); setTimeout(()=>inp.classList.remove('getar'),400); return; }
+  const angka=+v;
+  prosesJawab(angka, s, inp);
+}
+
+/* --- Drag and drop --- */
+function renderDrag(s, area){
+  area.style.display='block';
+  // Tampilkan ulang teks soal dengan zona lempar (ganti bilangan-kotak)
+  $('#teks-soal').innerHTML='';
+  const parts=s.teks.split('___');
+  const span=document.createElement('span');
+  const z=document.createElement('span');
+  z.className='zona-lempar'; z.id='zona-lempar'; z.textContent='?';
+  $('#teks-soal').appendChild(document.createTextNode(parts[0]));
+  $('#teks-soal').appendChild(z);
+  $('#teks-soal').appendChild(document.createTextNode(parts[1]));
+
+  const ub=document.createElement('div'); ub.className='ubin-bungkus'; ub.id='ubin-bungkus';
+  acak(s.ubin).forEach(val=>{
+    const u=document.createElement('div');
+    u.className='ubin'; u.textContent=val; u.dataset.val=val;
+    buatDraggable(u, s);
+    ub.appendChild(u);
+  });
+  area.appendChild(ub);
+
+  const petunjuk=document.createElement('div');
+  petunjuk.style.fontSize='13px'; petunjuk.style.color='#6b7280'; petunjuk.style.marginTop='12px';
+  petunjuk.textContent='👆 Seret salah satu ubin ke dalam kotak berdegar untuk menjawab.';
+  area.appendChild(petunjuk);
+}
+function buatDraggable(u, s){
+  let offsetX=0, offsetY=0, sedang=false, asalParent=null;
+
+  function mulai(clientX, clientY){
+    if(state.selesai || u.classList.contains('terpakai')) return;
+    sedang=true; asalParent=u.parentNode;
+    const rect=u.getBoundingClientRect();
+    offsetX=clientX-rect.left; offsetY=clientY-rect.top;
+    u.style.position='fixed';
+    u.style.left=rect.left+'px'; u.style.top=rect.top+'px';
+    u.style.width=rect.width+'px'; u.style.zIndex=10000;
+    u.classList.add('dipakai-temp');
+    document.body.appendChild(u);
+  }
+  function gerak(clientX, clientY){
+    if(!sedang) return;
+    u.style.left=(clientX-offsetX)+'px';
+    u.style.top=(clientY-offsetY)+'px';
+    const z=$('#zona-lempar');
+    if(z){ const r=z.getBoundingClientRect();
+      const atas = clientX>=r.left && clientX<=r.right && clientY>=r.top && clientY<=r.bottom;
+      z.classList.toggle('drag-atas', atas);
+    }
+  }
+  function selesai(clientX, clientY){
+    if(!sedang) return;
+    sedang=false; u.classList.remove('dipakai-temp');
+    const z=$('#zona-lempar');
+    let kena=false;
+    if(z){ const r=z.getBoundingClientRect();
+      kena = clientX>=r.left && clientX<=r.right && clientY>=r.top && clientY<=r.bottom;
+      z.classList.remove('drag-atas');
+    }
+    // reset style
+    u.style.position=''; u.style.left=''; u.style.top=''; u.style.width=''; u.style.zIndex='';
+    if(kena){
+      // pindahkan ke zona
+      z.innerHTML=''; z.classList.add('terisi');
+      // pindahkan ubin ke zona
+      z.appendChild(u);
+      u.style.margin='0 auto';
+      const nilai=+u.dataset.val;
+      // tandai semua ubin lain terpakai (sekarang hanya 1 jawaban)
+      document.querySelectorAll('.ubin').forEach(o=>{ if(o!==u) o.classList.add('terpakai'); });
+      prosesJawabDrag(nilai, s, z);
+    } else {
+      // kembali ke asal
+      asalParent.appendChild(u);
+    }
+  }
+
+  u.addEventListener('mousedown', e=>{ e.preventDefault(); mulai(e.clientX,e.clientY); });
+  window.addEventListener('mousemove', e=>{ if(sedang) gerak(e.clientX,e.clientY); });
+  window.addEventListener('mouseup', e=>{ if(sedang) selesai(e.clientX,e.clientY); });
+  u.addEventListener('touchstart', e=>{ const t=e.touches[0]; mulai(t.clientX,t.clientY); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchmove', e=>{ if(sedang){ const t=e.touches[0]; gerak(t.clientX,t.clientY); e.preventDefault(); } }, {passive:false});
+  window.addEventListener('touchend', e=>{ if(sedang){ const t=e.changedTouches[0]; selesai(t.clientX,t.clientY); } });
+}
+function prosesJawabDrag(nilai, s, z){
+  const benar = nilai===s.jawaban;
+  if(benar){ z.style.borderColor='var(--hijau)'; z.style.background='#e6f9e6'; }
+  else { z.style.borderColor='var(--merah)'; z.style.background='#fdeaea'; }
+  prosesJawab(nilai, s, z);
+}
+
+/* --- Klik grid --- */
+function renderGrid(s, area){
+  const g=document.createElement('div'); g.className='grid';
+  acak(s.kotak).forEach(val=>{
+    const b=document.createElement('button');
+    b.textContent=val; b.type='button';
+    b.onclick=()=>{
+      if(state.selesai) return;
+      [...g.children].forEach(x=>x.disabled=true);
+      const benar=val===s.jawaban;
+      if(benar) b.classList.add('benar');
+      else { b.classList.add('salah');
+        [...g.children].forEach(x=>{ if(+x.textContent===s.jawaban) x.classList.add('benar'); });
+      }
+      prosesJawab(val, s, b);
+    };
+    g.appendChild(b);
+  });
+  area.appendChild(g);
+}
+
+/* ====== Proses jawaban: benar/salah + retry + kunci lanjut ====== */
+function prosesJawab(jawabSiswa, s, elemenJawab){
+  state.jawabanSiswa = jawabSiswa;
+  state.percobaan += 1;
+  const benar = jawabSiswa===s.jawaban;
+  const pu = $('#penguatan');
+
+  if(benar){
+    state.selesai = true;
+    bunyi('benar');
+    const kata = state.percobaan===1 ? pilih(PUAT_BENAR) : pilih(PUAT_BENAR_ULANG);
+    pu.className='penguatan benar tampil';
+    pu.innerHTML = `<span class="emoji">${kata[0]}</span>${kata[1]}`;
+    $('#btn-lanjut').disabled=false;
+    $('#percobaan-info').style.display='none';
+    catatHasil(jawabSiswa, state.percobaan===1?'benar':'ulang');
+    if(state.percobaan===1) confettiSedikit();
+  } else {
+    bunyi('salah');
+    if(elemenJawab){
+      const target = (elemenJawab.closest && elemenJawab.closest('.kartu')) || elemenJawab;
+      target.classList.add('getar'); setTimeout(()=>target.classList.remove('getar'),400);
+    }
+    if(state.percobaan>=2){
+      // sudah 2x salah -> soal selesai, tampilkan jawaban benar
+      state.selesai = true;
+      const kata = pilih(PUAT_SALAH);
+      pu.className='penguatan info tampil';
+      pu.innerHTML = `<span class="emoji">💡</span>Jawaban benarnya adalah <b>${s.jawaban}</b>. ${kata[1]} Yuk lanjut ke soal berikutnya!`;
+      $('#btn-lanjut').disabled=false;
+      $('#percobaan-info').style.display='none';
+      catatHasil(jawabSiswa, 'salah');
+    } else {
+      // masih percobaan 1 -> beri kesempatan ulang
+      const kata = pilih(PUAT_SALAH);
+      pu.className='penguatan salah tampil';
+      pu.innerHTML = `<span class="emoji">${kata[0]}</span>Belum tepat. ${kata[1]}`;
+      $('#percobaan-info').textContent = `(percobaan 2 dari 2 — terakhir kesempatanmu!)`;
+      // Reset area untuk percobaan kedua (tapi tetap soal yang sama)
+      setTimeout(()=>siapkanUlang(s), 700);
+    }
+  }
+}
+function siapkanUlang(s){
+  // bersihkan area jawab & tampilkan ulang jenis yang sama, status percobaan dipertahankan
+  const area=$('#area-jawab');
+  area.innerHTML=''; area.className='area-jawab';
+  // reset teks soal
+  const parts=s.teks.split('___');
+  $('#teks-soal').innerHTML = parts[0]+'<span class="bilangan-kotak">?</span>'+parts[1];
+  if(s.jenis==='pilgan') renderPilgan(s, area);
+  else if(s.jenis==='input') renderInput(s, area);
+  else if(s.jenis==='drag') renderDrag(s, area);
+  else if(s.jenis==='grid') renderGrid(s, area);
+}
+
+function catatHasil(jawabSiswa, status){
+  const s=SOAL[state.idx];
+  state.hasil.push({
+    no: state.idx+1,
+    teks: s.teks.replace('___','?'),
+    jawabanBenar: s.jawaban,
+    jawabanSiswa: jawabSiswa,
+    status: status
+  });
+}
+
+/* ====== Tombol lanjut ====== */
+function lanjut(){
+  if(!state.selesai) return;
+  state.idx++;
+  if(state.idx>=SOAL.length){ tampilkanHasil(); }
+  else { tampilkanSoal(); }
+}
+
+/* ====== Hasil akhir ====== */
+function tampilkanHasil(){
+  gantiLayar('layar-hasil');
+  $('#bar-isi').style.width='100%';
+  const benarPertama = state.hasil.filter(h=>h.status==='benar').length;
+  const benarUlang = state.hasil.filter(h=>h.status==='ulang').length;
+  const salah = state.hasil.filter(h=>h.status==='salah').length;
+  const skor = benarPertama*100 + benarUlang*60;
+  const max = SOAL.length*100;
+  const persen = Math.round(skor/max*100);
+
+  $('#hasil-sapa').textContent = `Kerja bagus, ${state.nama}! (Kelas ${state.kelas})`;
+  $('#skor-besar').textContent = `${persen}/100`;
+  $('#skor-teks').innerHTML = `Skor total: <b>${skor}</b> dari ${max} • `+
+    `✅ Benar langsung: ${benarPertama} • 🟡 Benar setelah ulang: ${benarUlang} • ❌ Salah: ${salah}`;
+
+  // bintang
+  let bintang=1;
+  if(persen>=80) bintang=3; else if(persen>=60) bintang=2; else bintang=1;
+  $('#bintang').textContent = '⭐'.repeat(bintang) + '☆'.repeat(3-bintang);
+
+  // tabel
+  const tb=$('#tubuh-hasil'); tb.innerHTML='';
+  state.hasil.forEach(h=>{
+    const tr=document.createElement('tr');
+    let badge;
+    if(h.status==='benar') badge='<span class="badge-benar">✅ Benar</span>';
+    else if(h.status==='ulang') badge='<span class="badge-ulang">🟡 Ulang</span>';
+    else badge='<span class="badge-salah">❌ Salah</span>';
+    const tampilJawab = h.status==='salah' ? `${h.jawabanSiswa} → ${h.jawabanBenar}` : `${h.jawabanSiswa}`;
+    tr.innerHTML = `<td>${h.no}</td><td style="font-size:13px;">${h.teks}</td><td style="font-weight:700;">${tampilJawab}</td><td>${badge}</td>`;
+    tb.appendChild(tr);
+  });
+  bunyi('selesai');
+  if(bintang>=2) confettiBesak();
+}
+
+/* ====== Confetti ====== */
+const canvas=$('#confetti'); const ctx=canvas.getContext('2d');
+let confettiList=[], confettiAnim=null;
+function ukurCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+window.addEventListener('resize', ukurCanvas); ukurCanvas();
+function confettiSedikit(){ lemparConfetti(40); }
+function confettiBesak(){ lemparConfetti(180); }
+function lemparConfetti(n){
+  const warna=['#4a90e2','#f5c542','#5ec85e','#ef5b5b','#8e6bd6','#ff9a3c'];
+  for(let i=0;i<n;i++){
+    confettiList.push({
+      x:Math.random()*canvas.width, y:-20,
+      vx:(Math.random()-0.5)*4, vy:Math.random()*3+2,
+      rot:Math.random()*Math.PI, vr:(Math.random()-0.5)*0.3,
+      size:Math.random()*8+4, warna:warna[Math.floor(Math.random()*warna.length)]
+    });
+  }
+  if(!confettiAnim) animasiConfetti();
+}
+function animasiConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confettiList=confettiList.filter(c=>{
+    c.x+=c.vx; c.y+=c.vy; c.vy+=0.05; c.rot+=c.vr;
+    if(c.y>canvas.height+30) return false;
+    ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.rot);
+    ctx.fillStyle=c.warna; ctx.fillRect(-c.size/2,-c.size/2,c.size,c.size*0.6);
+    ctx.restore();
+    return true;
+  });
+  if(confettiList.length>0){ confettiAnim=requestAnimationFrame(animasiConfetti); }
+  else { confettiAnim=null; ctx.clearRect(0,0,canvas.width,canvas.height); }
+}
+
+/* ====== Navigasi layar ====== */
+function gantiLayar(id){
+  document.querySelectorAll('.layar').forEach(l=>l.classList.remove('aktif'));
+  $('#'+id).classList.add('aktif');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ====== Event handler ====== */
+// Pilih kelas
+$('#pilih-kelas').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  [...$('#pilih-kelas').children].forEach(x=>x.classList.remove('terpilih'));
+  b.classList.add('terpilih');
+  state.kelas=b.dataset.kelas;
+});
+// Mulai
+$('#btn-mulai').addEventListener('click', ()=>{
+  const nama=$('#nama').value.trim();
+  if(!nama){ $('#err-identitas').textContent='⚠️ Tulis namamu dulu, ya!'; $('#nama').focus(); return; }
+  if(!state.kelas){ $('#err-identitas').textContent='⚠️ Pilih kelasmu dulu, ya!'; return; }
+  $('#err-identitas').textContent='';
+  state.nama=nama; state.idx=0; state.hasil=[];
+  SOAL = buatSoalAcak(); // soal & angka baru setiap kali mulai
+  gantiLayar('layar-kuis');
+  tampilkanSoal();
+});
+// Enter di nama -> mulai
+$('#nama').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#btn-mulai').click(); });
+// Lanjut
+$('#btn-lanjut').addEventListener('click', lanjut);
+// Main lagi
+$('#btn-ulang').addEventListener('click', ()=>{
+  state={nama:'',kelas:'',idx:0,percobaan:0,jawabanSiswa:null,selesai:false,hasil:[]};
+  $('#nama').value=''; [...$('#pilih-kelas').children].forEach(x=>x.classList.remove('terpilih'));
+  gantiLayar('layar-identitas');
+});
+</script>
+</body>
+</html>
